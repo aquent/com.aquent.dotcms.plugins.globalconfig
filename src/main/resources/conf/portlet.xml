@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<portlet-app>
+	<portlet>
+		<portlet-name>EXT_AQUENT_GLOBAL_CONFIG</portlet-name>
+		<display-name>Aquent Global Config</display-name>
+		<portlet-class>com.liferay.portlet.JSPPortlet</portlet-class>
+		<init-param>
+				<name>view-jsp</name>
+				<value>/ext/global_config.jsp</value>
+		</init-param>
+		<expiration-cache>0</expiration-cache>
+		<supports>
+			<mime-type>text/html</mime-type>
+		</supports>
+		<security-role-ref>
+			<role-name>CMS User</role-name>
+		</security-role-ref>
+	</portlet>
+</portlet-app>

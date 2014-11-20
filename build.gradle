@@ -1,0 +1,43 @@
+apply plugin: 'osgi'
+apply plugin: 'eclipse'
+apply plugin: 'propdeps'
+apply plugin: 'propdeps-maven'
+apply plugin: 'propdeps-eclipse'
+
+sourceCompatibility = '1.7'
+version = '0.1'
+
+repositories {
+	mavenCentral()
+	maven { url "http://repo.dotcms.com/artifactory/libs-release" }
+}
+
+dependencies {
+	compile('com.dotcms:dotcms:2.5.3') { transitive = true }
+	provided('javax.servlet:servlet-api:2.5')
+}
+
+buildscript {
+	repositories {
+		maven { url 'http://repo.spring.io/plugins-release' }
+	}
+	dependencies {
+		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+	}
+}
+
+jar {
+	manifest {
+		name = 'Aquent Global Configuration'
+		symbolicName = 'com.aquent.dotcms.plugins.globalconfig'
+		instruction 'Bundle-Vendor', 'Aquent, LLC (cfalzone@aquent.com)'
+		instruction 'Bundle-Description', 'Aquent Global Config Plugin'
+		instruction 'Bundle-DocURL', 'http://www.aquent.com'
+		instruction 'Bundle-Activator', 'com.aquent.globalconfig.GlobalConfigActivator'
+		instruction 'DynamicImport-Package', '*'
+		instruction 'Import-Package', '*;version=0'
+		instruction 'Export-Package', '*;version=0'
+		instruction 'Override-Classes', 'com.aquent.globalconfig.GlobalConfigUtil'
+	}
+}
+

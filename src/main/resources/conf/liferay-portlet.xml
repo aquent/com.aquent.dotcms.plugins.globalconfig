@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!DOCTYPE portlets>
+
+<portlets>
+	<portlet id="EXT_AQUENT_GLOBAL_CONFIG" narrow="true" />
+</portlets>
