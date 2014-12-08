@@ -3,6 +3,7 @@ package com.aquent.globalconfig;
 import org.json.JSONObject;
 
 import com.dotmarketing.util.Logger;
+import com.dotmarketing.util.UtilMethods;
 
 public class GlobalConfigUtil {
 	public final static GlobalConfigUtil INSTANCE = new GlobalConfigUtil();
@@ -50,5 +51,58 @@ public class GlobalConfigUtil {
 			Logger.error(this, "Unable to get the data from the properties file", e);
 			return null;
 		}
+	}
+	
+	/**
+	 * Updates a property in the data
+	 * 
+	 * @param 	orig_key	The original key
+	 * @param 	key			The new key
+	 * @param 	value		The value
+	 * @return 				true if successfully changed, false otherwise
+	 */
+	public boolean updateProperty(String orig_key, String key, String value) {
+		synchronized("agc_data") {
+			// Remove the key from the data
+			JSONObject data = getDataFromFile();
+			if(UtilMethods.isSet(orig_key) && data.has(orig_key)) data.remove(orig_key);
+			if(UtilMethods.isSet(key) && data.has(key)) data.remove(key);
+			
+			try {
+				// Add the key to the data
+				data.put(key, value);
+				// Save the data
+				GlobalConfigCacheHandler.INSTANCE.saveData(data);
+			} catch(Exception e) {
+				Logger.error(this, "Unable to add the new property: "+key+"="+value);
+				return false;
+			}
+		}
+		
+		return true;
+	}
+
+	/**
+	 * Deletes a property from the data
+	 * 
+	 * @param 	key		The key to remove
+	 * @return			true if successfully removed, false otherwise
+	 */
+	public boolean deleteProperty(String key) {
+		synchronized("agc_data") {
+			// Remove the key from the data
+			JSONObject data = getDataFromFile();
+			data.remove(key);
+			
+			try {
+				// Save the data
+				GlobalConfigCacheHandler.INSTANCE.saveData(data);
+			} catch(Exception e) {
+				Logger.error(this, "Unable to delete the property: "+key);
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }

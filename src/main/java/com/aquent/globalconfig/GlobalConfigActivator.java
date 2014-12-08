@@ -1,12 +1,23 @@
 package com.aquent.globalconfig;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.PropertyResourceBundle;
+import java.util.Set;
+
 import org.apache.felix.http.api.ExtHttpService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
+import com.dotmarketing.business.APILocator;
+import com.dotmarketing.exception.DotDataException;
 import com.dotmarketing.filters.CMSFilter;
 import com.dotmarketing.osgi.GenericBundleActivator;
+import com.dotmarketing.portlets.languagesmanager.model.Language;
 import com.dotmarketing.util.Logger;
 
 public class GlobalConfigActivator extends GenericBundleActivator {
@@ -28,6 +39,10 @@ public class GlobalConfigActivator extends GenericBundleActivator {
         
         // Register the portlets
         registerPortlets( bundleContext, new String[] { "conf/portlet.xml", "conf/liferay-portlet.xml"} );
+        
+        // Register language variables (portlet name)
+     	registerLanguageVariables( bundleContext );
+     	
     }
     
     @Override
@@ -76,5 +91,39 @@ public class GlobalConfigActivator extends GenericBundleActivator {
 		};
 		tracker.open();
     }
+    
+	private void registerLanguageVariables(Map<String, String> languageVariables, Language language) {
+		Map<String, String> emptyMap = new HashMap<String, String>();
+		Set<String> emptySet = new HashSet<String>();
+		try {
+
+			Logger.info(this, "Registering " + languageVariables.keySet().size() + " language variable(s)");
+			APILocator.getLanguageAPI().saveLanguageKeys(language, languageVariables, emptyMap, emptySet);
+
+		} catch (DotDataException e) {
+			Logger.warn(this, "Unable to register language variables", e);
+		}
+	}
+	
+	private void registerLanguageVariables(BundleContext context) {
+		try {
+
+			// Read all the language variables from the properties file
+			URL resourceURL = context.getBundle().getResource("conf/Language-ext.properties");
+			PropertyResourceBundle resourceBundle = new PropertyResourceBundle(resourceURL.openStream());
+			
+			// Put the properties in a map
+			Map<String, String> languageVariables = new HashMap<String, String>();
+			for(String key: resourceBundle.keySet()) {
+				languageVariables.put(key, resourceBundle.getString(key));
+			}
+			
+			// Register the variables in locale en_US
+			registerLanguageVariables(languageVariables, APILocator.getLanguageAPI().getLanguage("en", "US"));
+			
+		} catch (IOException e) {
+			Logger.warn(this, "Exception while registering language variables", e);
+		}
+	}
 
 }

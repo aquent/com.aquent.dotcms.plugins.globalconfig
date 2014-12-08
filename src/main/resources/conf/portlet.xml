@@ -4,15 +4,16 @@
 	<portlet>
 		<portlet-name>EXT_AQUENT_GLOBAL_CONFIG</portlet-name>
 		<display-name>Aquent Global Config</display-name>
-		<portlet-class>com.liferay.portlet.JSPPortlet</portlet-class>
+		<portlet-class>com.liferay.portlet.VelocityPortlet</portlet-class>
 		<init-param>
-				<name>view-jsp</name>
-				<value>/ext/global_config.jsp</value>
+			<name>view-template</name>
+			<value>/ext/global_config-v0.1.15.vm</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
 			<mime-type>text/html</mime-type>
 		</supports>
+		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
 		<security-role-ref>
 			<role-name>CMS User</role-name>
 		</security-role-ref>

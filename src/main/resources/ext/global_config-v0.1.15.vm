@@ -1,0 +1,221 @@
+<div id="agcPropertyList">
+	<table class="listingTable shadowBox">
+		<tbody>
+			<tr>
+				<th style="white-space:nowrap;">Aquent Global Config Administration - v0.1.15</th>	
+			</tr>
+			<tr>
+				<td class="buttonColumn">
+
+					<button dojoType="dijit.form.Button" onClick="flushCache()" iconClass="resetIcon">
+						Flush Cache
+					</button>
+					
+					<button dojoType="dijit.form.Button" onClick="showEditProperty('agc_new')" iconClass="addIcon">
+						Add a New Property
+					</button>
+
+				</td>
+			</tr>
+			<tr>
+				<th>Current Properties</th>
+			</tr>
+			<tr>
+				<td>
+					
+					<table class="listingTable shadowBox">
+						<tbody>
+							<tr>
+								<th style="white-space:nowrap;">Key</th>
+								<th style="white-space:nowrap;">Value</th>
+								<th style="white-space:nowrap;">Action</th>
+							</tr>
+					
+					#set($data = $gconfig.getDataFromFile())
+					#if($UtilMethods.isSet($data))
+						#set($keys = $data.getNames($data))
+						#foreach($key in $keys) 
+							#set($val = $data.getString($key))
+							<!-- $key = $val -->
+										
+							<tr id="agc_${velocityCount}">
+								<td>
+									<div id="agc_key_${velocityCount}">$!{key}</div>
+								</td>
+								<td>
+									<textarea disabled rows="1" style="width:250px;" id="agc_value_${velocityCount}">$!{val}</textarea>
+								</td>
+								<td>
+									<button dojoType="dijit.form.Button" onClick="showEditProperty('agc_${velocityCount}')" iconClass="editIcon">Edit Property</button>
+									<button dojoType="dijit.form.Button" onClick="deleteProperty('$!{key}')" iconClass="deleteIcon">Delete Property</button>
+								</td>
+							</tr>
+					
+						#end
+						
+						#if($keys.length() == 0)
+
+							<tr>
+								<td colspan="3">
+									No Properties yet.
+								</td>
+							</tr>
+							
+						#end
+					#else
+					
+							<tr>
+								<td colspan="3">
+									No Properties yet.
+								</td>
+							</tr>
+							
+					#end
+			
+						</tbody>
+					</table>
+					
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div dojoType="dijit.Dialog" id="propertyFormDialog" title="Property Form" style="display:none;height:320px;width:450px;vertical-align: middle;" draggable="true">
+	<div style="overflow-y:auto;" dojoType="dijit.layout.ContentPane">
+		<div style="padding:0 0 10px 0; border-bottom:1px solid #ccc;">
+			<form id="propertyForm" dojoType="dijit.form.Form">
+				<input type="hidden" id="agc_orig_key" name="agc_orig_key" dojoType="dijit.form.TextBox" />
+				<dl>
+					<dt>
+						<label for="agc_key">Key:</label>
+					</dt>
+					<dd style="clear: none;">
+						<input type="text" id="agc_key" name="agc_key" required="true" dojoType="dijit.form.ValidationTextBox" invalidMessage="Key is Required." />
+					</dd>
+					<dt>
+						<label for="agc_value">Value:</label>
+					</dt>
+					<dd style="clear: none;">
+						<textarea id="agc_value" name="agc_value" dojoType="dijit.form.Textarea" style="width:250px; min-height:40px;"></textarea>
+					</dd>
+				</dl>
+			</form>
+		</div>
+		<div class="clear"></div>
+		<div class="buttonRow">
+			<button dojoType="dijit.form.Button" onclick="editProperty()" type="button" iconClass="saveIcon">Save</button>
+			<button dojoType="dijit.form.Button" onclick="dijit.byId('propertyFormDialog').hide()" type="button" iconClass="cancelIcon">Cancel</button>
+		</div>
+	</div>
+</div>
+
+<div dojoType="dijit.Dialog" id="loadingDialog" title="Loading ..." style="display:none;">
+	<div style="overflow-y:auto;" dojoType="dijit.layout.ContentPane">
+		<p>Loading ...</p>
+	</div>
+</div>
+
+<script>
+
+	var errormessages = {
+		"no_init"    : "Servlet not initialized",
+		"no_user"    : "Unable to find your user",
+		"no_admin"   : "You must be CMS Administrator to do that",
+		"no_action"  : "No action specified",
+		"inv_action" : "An invalid action was specified",
+		"no_key"     : "Key must be set",
+		"no_value"   : "Value must be set",
+		"fail"       : "Unable to perform operation",
+		""           : "An unknown error occurred"
+	}
+
+	function flushCache() {	
+      	dijit.byId("loadingDialog").show();
+      	
+		dojo.xhrPost({
+			url: "/app/globalConfigServlet",
+			handleAs: "json",
+			content : {
+				action : "flush"
+			},
+			load: function(data) {
+				dijit.byId("loadingDialog").hide();
+				showMessage("The cache was successfully flushed", "Error flushing the cache", data);
+			}
+		});
+	}
+	
+	function showMessage(successmessage, errormessage, data) {
+		var status = "fail";
+		if("status" in data) status = data["status"];
+		
+		var message = (status === "fail") ? errormessage : successmessage; 
+		if("msg" in data) message = message + ": "+errormessages[data["msg"]];
+		
+		var messageicon = (status === "fail") ? "deleteIcon" : "resolveIcon"
+		 
+		showDotCMSSystemMessage("<div class=\"messageIcon "+messageicon+"\"></div>"+message)
+	}
+	
+	function showEditProperty(p) {
+		var i = p.replace('agc_', '');
+		var ok = '';
+		var k = '';
+		var v = '';
+		if(i !== 'new') {
+			ok = dojo.byId('agc_key_'+i).innerHTML;
+			k = dojo.byId('agc_key_'+i).innerHTML;
+			v = dojo.byId('agc_value_'+i).innerHTML;
+		}
+				
+		dijit.byId('agc_orig_key').set('value', ok);
+		dijit.byId('agc_key').set('value', k);
+		dijit.byId('agc_value').set('value', v);
+		dijit.byId('propertyFormDialog').show()
+	}
+	
+	function editProperty() {
+		dijit.byId('propertyFormDialog').hide()
+		dijit.byId("loadingDialog").show();
+		
+		var ok = dijit.byId('agc_orig_key').get('value');
+		var k = dijit.byId('agc_key').get('value');
+		var v = dijit.byId('agc_value').get('value');
+				
+		dojo.xhrPost({
+			url: "/app/globalConfigServlet",
+			handleAs: "json",
+			content: {
+				action : "edit",
+				orig_key : ok,
+				key : k,
+				value : v
+			},
+			load: function(data) {
+				dijit.byId("loadingDialog").hide();
+				showMessage("The property was successfully updated", "Error updating the property", data);
+			}
+		});
+	}
+	
+	function deleteProperty(k) {
+		dijit.byId("loadingDialog").show();
+		
+		dojo.xhrPost({
+			url: "/app/globalConfigServlet",
+			handleAs: "json",
+			content: {
+				action : "delete",
+				key : k 
+			},
+			load: function(data) {
+				dijit.byId("loadingDialog").hide();
+				showMessage("The property was successfully deleted", "Error deleting the property", data);
+			}
+		});
+	}
+</script>
+
+											
+						

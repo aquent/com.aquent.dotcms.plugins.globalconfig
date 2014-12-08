@@ -35,9 +35,8 @@ jar {
 		instruction 'Bundle-DocURL', 'http://www.aquent.com'
 		instruction 'Bundle-Activator', 'com.aquent.globalconfig.GlobalConfigActivator'
 		instruction 'DynamicImport-Package', '*'
-		instruction 'Import-Package', '*;version=0'
+		instruction 'Import-Package', 'org.json;version=0', '*;version=0'
 		instruction 'Export-Package', '*;version=0'
-		instruction 'Override-Classes', 'com.aquent.globalconfig.GlobalConfigUtil'
 	}
 }
 

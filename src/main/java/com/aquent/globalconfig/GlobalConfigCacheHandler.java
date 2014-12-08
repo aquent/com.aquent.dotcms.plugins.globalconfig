@@ -188,4 +188,23 @@ public enum GlobalConfigCacheHandler {
 		
 		return assetsDir;
 	}
+	
+	/**
+	 * Updates the data on file
+	 * 
+	 * @param 	newdata		A JSONObject for the new data
+	 * @throws Exception
+	 */
+	public void saveData(JSONObject newdata) throws Exception {		
+		String newDataString = newdata.toString();
+		
+		String f = getAssetsDir() + File.separator + PLUGIN_FILE_NAME;
+		File jsonFile = new File(f);
+		FileOutputStream oFile = new FileOutputStream(jsonFile, false);
+		oFile.write(newDataString.getBytes());
+		oFile.flush();
+		oFile.close();
+		
+		removeAll();
+	}
 }
