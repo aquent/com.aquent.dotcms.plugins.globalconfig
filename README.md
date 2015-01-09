@@ -33,10 +33,10 @@ for(String k : data.getNames(data)) {
 } 
 
 // Update a property
-boolean status = gcu.updateProperty("original_key", "new_key", "new_value");
+boolean update_status = gcu.updateProperty("original_key", "new_key", "new_value");
 
 // Delete a property
-boolean status = gcu.deleteProperty("key");
+boolean delete_status = gcu.deleteProperty("key");
 ```
 
 In Velocity Code:
