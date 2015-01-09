@@ -2,7 +2,7 @@
 	<table class="listingTable shadowBox">
 		<tbody>
 			<tr>
-				<th style="white-space:nowrap;">Aquent Global Config Administration - v0.1.15</th>	
+				<th style="white-space:nowrap;">Aquent Global Config Administration - v0.2.0</th>	
 			</tr>
 			<tr>
 				<td class="buttonColumn">
@@ -195,6 +195,7 @@
 			load: function(data) {
 				dijit.byId("loadingDialog").hide();
 				showMessage("The property was successfully updated", "Error updating the property", data);
+				location.reload();
 			}
 		});
 	}
@@ -212,6 +213,7 @@
 			load: function(data) {
 				dijit.byId("loadingDialog").hide();
 				showMessage("The property was successfully deleted", "Error deleting the property", data);
+				location.reload();
 			}
 		});
 	}
