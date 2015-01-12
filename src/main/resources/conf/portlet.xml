@@ -7,7 +7,7 @@
 		<portlet-class>com.liferay.portlet.VelocityPortlet</portlet-class>
 		<init-param>
 			<name>view-template</name>
-			<value>/ext/global_config-v0.2.0.vm</value>
+			<value>/ext/global_config-v0.2.3.vm</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>

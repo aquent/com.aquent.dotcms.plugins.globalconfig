@@ -2,7 +2,7 @@
 	<table class="listingTable shadowBox">
 		<tbody>
 			<tr>
-				<th style="white-space:nowrap;">Aquent Global Config Administration - v0.2.0</th>	
+				<th style="white-space:nowrap;">Aquent Global Config Administration - v0.2.3</th>	
 			</tr>
 			<tr>
 				<td class="buttonColumn">
@@ -43,7 +43,7 @@
 									<div id="agc_key_${velocityCount}">$!{key}</div>
 								</td>
 								<td>
-									<textarea disabled rows="1" style="width:250px;" id="agc_value_${velocityCount}">$!{val}</textarea>
+									<textarea dojoType="dijit.form.Textarea" disabled rows="1" style="width:250px;" id="agc_value_${velocityCount}">$!{val}</textarea>
 								</td>
 								<td>
 									<button dojoType="dijit.form.Button" onClick="showEditProperty('agc_${velocityCount}')" iconClass="editIcon">Edit Property</button>
@@ -166,7 +166,7 @@
 		if(i !== 'new') {
 			ok = dojo.byId('agc_key_'+i).innerHTML;
 			k = dojo.byId('agc_key_'+i).innerHTML;
-			v = dojo.byId('agc_value_'+i).innerHTML;
+			v = dijit.byId('agc_value_'+i).get('value');
 		}
 				
 		dijit.byId('agc_orig_key').set('value', ok);
