@@ -5,7 +5,6 @@ apply plugin: 'propdeps-maven'
 apply plugin: 'propdeps-eclipse'
 
 sourceCompatibility = '1.7'
-version = '0.2'
 
 repositories {
 	mavenCentral()
