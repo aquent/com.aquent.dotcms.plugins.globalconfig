@@ -1,7 +1,8 @@
 package com.aquent.globalconfig;
 
+import java.util.HashMap;
+
 import org.apache.velocity.tools.view.tools.ViewTool;
-import org.json.JSONObject;
 
 import com.dotmarketing.util.Logger;
 
@@ -27,7 +28,7 @@ public class GlobalConfigViewtool implements ViewTool {
 	 * 
 	 * @return  The Data object containing all the keys and values
 	 */
-	public JSONObject getData() {
+	public HashMap<String,String> getData() {
 		try {
 			return GlobalConfigCacheHandler.INSTANCE.getData(false);
 		} catch(Exception e) {
@@ -42,7 +43,7 @@ public class GlobalConfigViewtool implements ViewTool {
 	 * 
 	 * @return	The Data object containing all the keys and values
 	 */
-	public JSONObject getDataFromFile() {
+	public HashMap<String,String> getDataFromFile() {
 		try {
 			return GlobalConfigCacheHandler.INSTANCE.getData(true);
 		} catch(Exception e) {

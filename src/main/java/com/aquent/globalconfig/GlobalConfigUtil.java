@@ -1,6 +1,6 @@
 package com.aquent.globalconfig;
 
-import org.json.JSONObject;
+import java.util.HashMap;
 
 import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
@@ -29,7 +29,7 @@ public class GlobalConfigUtil {
 	 * 
 	 * @return  The Data object containing all the keys and values
 	 */
-	public JSONObject getData() {
+	public HashMap<String,String> getData() {
 		try {
 			return GlobalConfigCacheHandler.INSTANCE.getData(false);
 		} catch(Exception e) {
@@ -44,7 +44,7 @@ public class GlobalConfigUtil {
 	 * 
 	 * @return	The Data object containing all the keys and values
 	 */
-	public JSONObject getDataFromFile() {
+	public HashMap<String,String> getDataFromFile() {
 		try {
 			return GlobalConfigCacheHandler.INSTANCE.getData(true);
 		} catch(Exception e) {
@@ -64,9 +64,9 @@ public class GlobalConfigUtil {
 	public boolean updateProperty(String orig_key, String key, String value) {
 		synchronized("agc_data") {
 			// Remove the key from the data
-			JSONObject data = getDataFromFile();
-			if(UtilMethods.isSet(orig_key) && data.has(orig_key)) data.remove(orig_key);
-			if(UtilMethods.isSet(key) && data.has(key)) data.remove(key);
+		    HashMap<String,String> data = getDataFromFile();
+			if(UtilMethods.isSet(orig_key) && data.containsKey(orig_key)) data.remove(orig_key);
+			if(UtilMethods.isSet(key) && data.containsKey(key)) data.remove(key);
 			
 			try {
 				// Add the key to the data
@@ -91,7 +91,7 @@ public class GlobalConfigUtil {
 	public boolean deleteProperty(String key) {
 		synchronized("agc_data") {
 			// Remove the key from the data
-			JSONObject data = getDataFromFile();
+		    HashMap<String,String> data = getDataFromFile();
 			data.remove(key);
 			
 			try {
