@@ -15,6 +15,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.liferay.util.FileUtil;
 
 public enum GlobalConfigCacheHandler {
 	// Makes this a singleton
@@ -174,11 +175,8 @@ public enum GlobalConfigCacheHandler {
 	 */
 	private String getAssetsDir() throws Exception {
 		if(!UtilMethods.isSet(assetsDir)) {
-			if (UtilMethods.isSet(Config.getStringProperty("ASSET_REAL_PATH", null))) {
-				assetsDir = Config.getStringProperty("ASSET_REAL_PATH", null);
-			} else {
-				assetsDir = Config.CONTEXT.getRealPath(File.separator + Config.getStringProperty("ASSET_PATH", null));
-			}	
+		    assetsDir = Config.getStringProperty("ASSET_REAL_PATH", 
+		                      FileUtil.getRealPath(Config.getStringProperty("ASSET_PATH", null)));	
 		}
 		
 		if(!UtilMethods.isSet(assetsDir)) {
