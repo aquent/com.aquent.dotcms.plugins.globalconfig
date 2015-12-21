@@ -2,8 +2,8 @@ package com.aquent.globalconfig;
 
 import java.io.File;
 import java.io.FileOutputStream;
-
-import org.json.JSONObject;
+import java.lang.reflect.Type;
+import java.util.HashMap;
 
 import com.dotmarketing.business.CacheLocator;
 import com.dotmarketing.business.DotCacheAdministrator;
@@ -13,6 +13,9 @@ import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.liferay.util.FileUtil;
 
 public enum GlobalConfigCacheHandler {
 	// Makes this a singleton
@@ -25,7 +28,9 @@ public enum GlobalConfigCacheHandler {
 	public static final String PLUGIN_FILE_NAME = "aquentglobalconfig.json";
 	
 	private String assetsDir = null;
-	private JSONObject data = null;
+	private HashMap<String,String> data = null;
+	private Gson gson = new Gson();
+	private Type dataType = new TypeToken<HashMap<String,String>>() {}.getType();
 	
 	
 	/**
@@ -109,7 +114,7 @@ public enum GlobalConfigCacheHandler {
 	 * @return			The value of the property from memory or file
 	 */
 	private String loadProperty(String key) {
-		JSONObject props = null;
+		HashMap<String,String> props = null;
 		try {
 			props = getData();
 		} catch(Exception e) {
@@ -117,17 +122,10 @@ public enum GlobalConfigCacheHandler {
 			return null;
 		}
 		
-		if(props != null && props.has(key)) {
-			String value = null;
-			try {
-				value = props.getString(key);
-				return value;
-			} catch (Exception e) {
-				Logger.error(this, "Unable to load a value for key="+key, e);
-				return null;
-			}
+		if(props != null) {
+		    return props.get(key);
 		} else {
-			return null;
+		    return null;
 		}
 	}
 	
@@ -137,17 +135,15 @@ public enum GlobalConfigCacheHandler {
 	 * @return		The data object
 	 * @throws Exception
 	 */
-	public JSONObject getData(boolean fromFile) throws Exception {
-		if(data == null || fromFile) {
+	public HashMap<String,String> getData(boolean fromFile) throws Exception {
+	    if(data == null || fromFile) {
 			String f = getAssetsDir() + File.separator + PLUGIN_FILE_NAME;
-			
 			File jsonFile = new File(f);
 			String jsonString = "{}";
 			if(jsonFile.exists()) {
 				jsonString = Files.toString(jsonFile, Charsets.UTF_8);
 			} else {
 				// The file doesn't exist so let's create it
-				Logger.info(this, "The COnfig File does not exist, creating now: "+f);
 				jsonFile.createNewFile();
 				FileOutputStream oFile = new FileOutputStream(jsonFile, false);
 				oFile.write(jsonString.getBytes());
@@ -155,9 +151,8 @@ public enum GlobalConfigCacheHandler {
 				oFile.close();
 			}
 			
-			data = new JSONObject(jsonString);
+			data = gson.fromJson(jsonString, dataType);
 		}
-		
 		return data;
 	}
 	
@@ -167,23 +162,25 @@ public enum GlobalConfigCacheHandler {
 	 * @return		The data object
 	 * @throws Exception
 	 */
-	public JSONObject getData() throws Exception {
+	public HashMap<String,String> getData() throws Exception {
 		return getData(false);
 	}
 	
 	
 	/**
-	 * Get the assets path
+	 * Get the assets path.
 	 * 
 	 * @return	The assets path
+	 * @throws Exception when the assets directory is not found
 	 */
-	private String getAssetsDir() {
+	private String getAssetsDir() throws Exception {
 		if(!UtilMethods.isSet(assetsDir)) {
-			if (UtilMethods.isSet(Config.getStringProperty("ASSET_REAL_PATH"))) {
-				assetsDir = Config.getStringProperty("ASSET_REAL_PATH");
-			} else {
-				assetsDir = Config.CONTEXT.getRealPath(File.separator + Config.getStringProperty("ASSET_PATH"));
-			}	
+		    assetsDir = Config.getStringProperty("ASSET_REAL_PATH", 
+		                      FileUtil.getRealPath(Config.getStringProperty("ASSET_PATH", null)));	
+		}
+		
+		if(!UtilMethods.isSet(assetsDir)) {
+		    throw new Exception("No Assets Directory Found");
 		}
 		
 		return assetsDir;
@@ -195,8 +192,8 @@ public enum GlobalConfigCacheHandler {
 	 * @param 	newdata		A JSONObject for the new data
 	 * @throws Exception
 	 */
-	public void saveData(JSONObject newdata) throws Exception {		
-		String newDataString = newdata.toString();
+	public void saveData(HashMap<String,String> newdata) throws Exception {		
+		String newDataString = gson.toJson(newdata, dataType);
 		
 		String f = getAssetsDir() + File.separator + PLUGIN_FILE_NAME;
 		File jsonFile = new File(f);

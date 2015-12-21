@@ -2,19 +2,16 @@
 	<table class="listingTable shadowBox">
 		<tbody>
 			<tr>
-				<th style="white-space:nowrap;">Aquent Global Config Administration - v0.2.3</th>	
+				<th style="white-space:nowrap;">Aquent Global Config Administration - v0.3.2</th>	
 			</tr>
 			<tr>
 				<td class="buttonColumn">
-
 					<button dojoType="dijit.form.Button" onClick="flushCache()" iconClass="resetIcon">
 						Flush Cache
 					</button>
-					
 					<button dojoType="dijit.form.Button" onClick="showEditProperty('agc_new')" iconClass="addIcon">
 						Add a New Property
 					</button>
-
 				</td>
 			</tr>
 			<tr>
@@ -22,7 +19,6 @@
 			</tr>
 			<tr>
 				<td>
-					
 					<table class="listingTable shadowBox">
 						<tbody>
 							<tr>
@@ -30,12 +26,12 @@
 								<th style="white-space:nowrap;">Value</th>
 								<th style="white-space:nowrap;">Action</th>
 							</tr>
-					
+							
 					#set($data = $gconfig.getDataFromFile())
-					#if($UtilMethods.isSet($data))
-						#set($keys = $data.getNames($data))
+					#if($UtilMethods.isSet($data) && $data.size() > 0)
+						#set($keys = $data.keySet())
 						#foreach($key in $keys) 
-							#set($val = $data.getString($key))
+							#set($val = $data.get($key))
 							<!-- $key = $val -->
 										
 							<tr id="agc_${velocityCount}">
@@ -52,16 +48,6 @@
 							</tr>
 					
 						#end
-						
-						#if($keys.length() == 0)
-
-							<tr>
-								<td colspan="3">
-									No Properties yet.
-								</td>
-							</tr>
-							
-						#end
 					#else
 					
 							<tr>
@@ -71,16 +57,13 @@
 							</tr>
 							
 					#end
-			
 						</tbody>
 					</table>
-					
 				</td>
 			</tr>
 		</tbody>
 	</table>
 </div>
-
 <div dojoType="dijit.Dialog" id="propertyFormDialog" title="Property Form" style="display:none;height:320px;width:450px;vertical-align: middle;" draggable="true">
 	<div style="overflow-y:auto;" dojoType="dijit.layout.ContentPane">
 		<div style="padding:0 0 10px 0; border-bottom:1px solid #ccc;">
@@ -109,7 +92,6 @@
 		</div>
 	</div>
 </div>
-
 <div dojoType="dijit.Dialog" id="loadingDialog" title="Loading ..." style="display:none;">
 	<div style="overflow-y:auto;" dojoType="dijit.layout.ContentPane">
 		<p>Loading ...</p>
@@ -117,7 +99,6 @@
 </div>
 
 <script>
-
 	var errormessages = {
 		"no_init"    : "Servlet not initialized",
 		"no_user"    : "Unable to find your user",
@@ -129,7 +110,6 @@
 		"fail"       : "Unable to perform operation",
 		""           : "An unknown error occurred"
 	}
-
 	function flushCache() {	
       	dijit.byId("loadingDialog").show();
       	
@@ -145,7 +125,6 @@
 			}
 		});
 	}
-	
 	function showMessage(successmessage, errormessage, data) {
 		var status = "fail";
 		if("status" in data) status = data["status"];
@@ -157,7 +136,6 @@
 		 
 		showDotCMSSystemMessage("<div class=\"messageIcon "+messageicon+"\"></div>"+message)
 	}
-	
 	function showEditProperty(p) {
 		var i = p.replace('agc_', '');
 		var ok = '';
@@ -174,7 +152,6 @@
 		dijit.byId('agc_value').set('value', v);
 		dijit.byId('propertyFormDialog').show()
 	}
-	
 	function editProperty() {
 		dijit.byId('propertyFormDialog').hide()
 		dijit.byId("loadingDialog").show();
@@ -199,7 +176,6 @@
 			}
 		});
 	}
-	
 	function deleteProperty(k) {
 		dijit.byId("loadingDialog").show();
 		
@@ -218,6 +194,3 @@
 		});
 	}
 </script>
-
-											
-						
