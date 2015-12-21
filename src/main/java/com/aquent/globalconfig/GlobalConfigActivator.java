@@ -8,14 +8,12 @@ import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.Set;
 
-import org.apache.felix.http.api.ExtHttpService;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.util.tracker.ServiceTracker;
-
+import com.dotcms.repackage.org.apache.felix.http.api.ExtHttpService;
+import com.dotcms.repackage.org.osgi.framework.BundleContext;
+import com.dotcms.repackage.org.osgi.framework.ServiceReference;
+import com.dotcms.repackage.org.osgi.util.tracker.ServiceTracker;
 import com.dotmarketing.business.APILocator;
 import com.dotmarketing.exception.DotDataException;
-import com.dotmarketing.filters.CMSFilter;
 import com.dotmarketing.osgi.GenericBundleActivator;
 import com.dotmarketing.portlets.languagesmanager.model.Language;
 import com.dotmarketing.util.Logger;
@@ -42,6 +40,10 @@ public class GlobalConfigActivator extends GenericBundleActivator {
         
         // Register language variables (portlet name)
      	registerLanguageVariables( bundleContext );
+     	
+     	// Load the data into memory
+     	HashMap<String, String> data = GlobalConfigCacheHandler.INSTANCE.getData(true);
+     	Logger.debug(this, "Loaded Data: "+data);
      	
     }
     
@@ -72,18 +74,12 @@ public class GlobalConfigActivator extends GenericBundleActivator {
 				} catch (Exception e) {
 					throw new RuntimeException("Failed to register servlets", e);
 				}
-				
-				// Add the Servlets to the Exclude list
-		    	CMSFilter.addExclude("/app/globalConfigServlet");
 		    	
 				Logger.info(this, "Registered servlets");
 
 				return extHttpService;
 			}
 			@Override public void removedService(ServiceReference<ExtHttpService> reference, ExtHttpService extHttpService) {
-				// Remove serlvet Excludes from the list
-		    	CMSFilter.removeExclude("/app/globalConfigServlet");
-		    	
 				extHttpService.unregisterServlet(gcs);
 				
 				super.removedService(reference, extHttpService);
